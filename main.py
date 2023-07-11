@@ -10,23 +10,18 @@ AVERAGE_TRAIN_SPEED_IN_kM_PER_H: int = 30
 # get data
 real_distances = pd.read_csv('./data/real_distances.csv', delimiter=';')
 real_distances.set_index(real_distances.columns[0], inplace=True)
-real_distances = real_distances.astype(str).apply(
-    lambda x: x.str.replace(',', '.')).astype(float)
+real_distances = real_distances.astype(str).apply(lambda x: x.str.replace(',', '.')).astype(float)
 real_distances = real_distances.add(real_distances.T, fill_value=0)
 
 direct_distances = pd.read_csv('./data/direct_distances.csv', delimiter=';')
 direct_distances.set_index(direct_distances.columns[0], inplace=True)
-direct_distances = direct_distances.astype(str).apply(
-    lambda x: x.str.replace(',', '.')).astype(float)
+direct_distances = direct_distances.astype(str).apply(lambda x: x.str.replace(',', '.')).astype(float)
 direct_distances = direct_distances.add(direct_distances.T, fill_value=0)
 
-subway_lines = pd.read_csv('./data/subway_lines.csv',
-                           header=None, delimiter=';')
+subway_lines = pd.read_csv('./data/subway_lines.csv', header=None, delimiter=';')
 
 # Data structures
 # Enums
-
-
 class StationName(Enum):
     E1 = 'E1'
     E2 = 'E2'
@@ -43,18 +38,15 @@ class StationName(Enum):
     E13 = 'E13'
     E14 = 'E14'
 
-
 class SubwayLineName(Enum):
-    BLUE = 'Azul'
-    YELLOW = 'Amarela'
-    RED = 'Vermelha'
-    GREEN = 'Verde'
+    BLUE = 'BLUE'
+    YELLOW = 'YELLOW'
+    RED = 'RED'
+    GREEN = 'GREEN'
 
 
 # Graph
 NODE = TypeVar('NODE')
-
-
 class WeightedGraph(Generic[NODE]):
     def __init__(self) -> None:
         self.graph: Dict[NODE, Dict[NODE, int]] = {}
@@ -75,8 +67,6 @@ class WeightedGraph(Generic[NODE]):
         return list(self.graph.keys())
 
 # problem specific classes
-
-
 class StationLine():
     def __init__(self, station: StationName, subway_line: SubwayLineName) -> None:
         self.station = station
@@ -96,7 +86,6 @@ class StationLine():
 
     def __repr__(self) -> str:
         return f"StationLine(station={self.station}, subway_line={self.subway_line})"
-
 
 class SubwayGraph(WeightedGraph[StationLine]):
     def __init__(self) -> None:
@@ -129,8 +118,7 @@ class SubwayGraph(WeightedGraph[StationLine]):
         return function_return
 
     def heuristic(self, node: StationLine, goal: StationLine) -> float:
-        predicted_cost = (direct_distances[node.station.value]  # h cost = distance from end node
-                          [goal.station.value]/AVERAGE_TRAIN_SPEED_IN_kM_PER_H)*60
+        predicted_cost = (direct_distances[node.station.value][goal.station.value]/AVERAGE_TRAIN_SPEED_IN_kM_PER_H)*60 # h cost = distance from end node
         return predicted_cost
 
     def find_path(self, start: StationLine, goal: StationLine) -> Tuple[List[StationLine], float]:
@@ -166,21 +154,10 @@ class SubwayGraph(WeightedGraph[StationLine]):
 
         return None, None  # If there is no path
 
-
-# user input
-# start_station: StationName = input("In which station are u? ")
-# if start_station not in StationName.__members__:
-#     print("Invalid station name")
-#     exit()
-# goal_station: StationName = input("Which station do u wanna go? ")
-# if goal_station not in StationName.__members__:
-#     print("Invalid station name")
-#     exit()
-
 # create the subway graph
 subway = SubwayGraph()
-start_node = StationLine(station=StationName.E4,
-                         subway_line=SubwayLineName.GREEN)
-goal_node = StationLine(station=StationName.E11,
-                        subway_line=SubwayLineName.RED)
+
+start_node = StationLine(station=StationName.E4, subway_line=SubwayLineName.GREEN)
+goal_node = StationLine(station=StationName.E11, subway_line=SubwayLineName.RED)
+
 print(subway.find_path(start=start_node, goal=goal_node))
