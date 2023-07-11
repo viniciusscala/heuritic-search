@@ -123,16 +123,16 @@ class SubwayGraph(WeightedGraph[StationLine]):
 
     def find_path(self, start: StationLine, goal: StationLine) -> Tuple[List[StationLine], float]:
         # A* algorithm
-        open_set = [(self.heuristic(start, goal), 0, start, [])]
+        frontier = [(self.heuristic(start, goal), 0, start, [])]
         # 1. cost i think i am going to use to reach where i wanna go
         # 2. real cost until here
         # 3. current node
         # 4. path until here
         visited = set()
 
-        while open_set:
-            current_entry = min(open_set, key=lambda x: x[0])
-            open_set.remove(current_entry)
+        while frontier:
+            current_entry = min(frontier, key=lambda x: x[0])
+            frontier.remove(current_entry)
             estimated_total_cost, cost_to_reach_current, current, path = current_entry
 
             if current in visited:
@@ -149,7 +149,7 @@ class SubwayGraph(WeightedGraph[StationLine]):
                 new_cost = cost_to_reach_current + cost
                 estimated_total_cost = new_cost + \
                     self.heuristic(neighbor, goal)
-                open_set.append(
+                frontier.append(
                     (estimated_total_cost, new_cost, neighbor, path))
 
         return None, None  # If there is no path
@@ -157,7 +157,7 @@ class SubwayGraph(WeightedGraph[StationLine]):
 # create the subway graph
 subway = SubwayGraph()
 
-start_node = StationLine(station=StationName.E4, subway_line=SubwayLineName.GREEN)
-goal_node = StationLine(station=StationName.E11, subway_line=SubwayLineName.RED)
+start_node = StationLine(station=StationName.E4, subway_line=SubwayLineName.YELLOW)
+goal_node = StationLine(station=StationName.E4, subway_line=SubwayLineName.GREEN)
 
 print(subway.find_path(start=start_node, goal=goal_node))
